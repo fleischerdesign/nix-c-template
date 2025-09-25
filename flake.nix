@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
-  outputs = { nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -15,7 +15,7 @@
           packages = [
             pkgs.clang
             pkgs.gdb
-            pkgs.make
+            pkgs.gnumake
             pkgs.cmake
             pkgs.pkg-config
             pkgs.clang-tools
