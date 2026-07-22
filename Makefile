@@ -1,48 +1,16 @@
-CC       ?= gcc
-CFLAGS   ?= -Isrc -Wall -Wextra -MMD -MP
-LDFLAGS  ?=
-LDLIBS   ?=
+CC ?= gcc
+CFLAGS ?= -Wall -Wextra -O2
+SRC = src/main.c
+OUT_DIR = build/release
+TARGET = $(OUT_DIR)/app
 
-TARGET   ?= app
-SRCDIR   ?= src
-BUILD_MODE ?= release
-BUILDDIR  ?= build/$(BUILD_MODE)
+all: $(TARGET)
 
-ifeq ($(BUILD_MODE),debug)
-	CFLAGS += -Og -g3 -fsanitize=address,undefined
-	LDFLAGS += -fsanitize=address,undefined
-else
-	CFLAGS += -O2
-	LDFLAGS += -Wl,-s
-endif
-
-SRCS = $(wildcard $(SRCDIR)/*.c)
-OBJS = $(SRCS:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
-DEPS = $(OBJS:.o=.d)
-
-.PHONY: all clean debug release compile_commands
-
-all: $(BUILDDIR)/$(TARGET)
-
-debug:
-	$(MAKE) BUILD_MODE=debug
-
-release:
-	$(MAKE) BUILD_MODE=release
-
-$(BUILDDIR)/$(TARGET): $(OBJS) | $(BUILDDIR)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILDDIR):
-	mkdir -p $@
-
-compile_commands.json:
-	bear -- $(MAKE) BUILD_MODE=debug
+$(TARGET): $(SRC)
+	@mkdir -p $(OUT_DIR)
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf $(BUILDDIR) compile_commands.json
+	rm -rf build
 
--include $(DEPS)
+.PHONY: all clean
